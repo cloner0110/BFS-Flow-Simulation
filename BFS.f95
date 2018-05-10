@@ -24,8 +24,6 @@ REAL , ALLOCATABLE :: VP(:,:)
 REAL , ALLOCATABLE :: D(:,:)
 REAL , ALLOCATABLE :: X(:,:)
 REAL , ALLOCATABLE :: Y(:,:)
-
-
 !**************************
 !H=H1+H2
 !L=L1+L2
@@ -76,15 +74,12 @@ allocate (PNEW(NX,NY))
 !************************** INITIAL BOUNDARY VALUE 
 UINIT(:,:)=0.5
 VINIT(:,:)=0.5
-!U(:,:)=UINIT(:,:)
-!V(:,:)=VINIT(:,:)
 DO I=1,NX
 	DO J=1,NY
 	X(I,J)=(I-1)*DX
 	Y(I,J)=(J-1)*DY
 	END DO
 END DO
-
 DO I=1,NX
 	DO J=1,NY
 		IF ( X(I,J)>=0 .AND. X(I,J)<=L1 .AND. Y(I,J)>=0 .AND. Y(I,J)<=H1 ) THEN
@@ -125,9 +120,8 @@ VTEMP(:,:)=VINIT(:,:)
   DO I=2,NX-1
     DO J=2,NY-1
 		IF(J<=NY1 .AND. I<=NX1 ) THEN
-    !    IF(Y(I,J)<=H1 .AND. X(I,J)<=L1 ) THEN
-        GOTO 10
-        END IF
+        		GOTO 10
+        	END IF
 P_NY1=(PTEMP(I,J)-PTEMP(I,J-1))/(RO*DY)
 P_NY2=(UTEMP(I,J)*(VTEMP(I,J)-VTEMP(I-1,J)))/DX
 P_NY3=(VTEMP(I,J)-VTEMP(I,J-1))/DY
@@ -146,9 +140,8 @@ P_NX7=2*DX*(UTEMP(I,J+1)+UTEMP(I,J-1))
 !******************************************************		
 U(I,J)=((P_NX5)-(P_NX1)-(P_NX2)+(NU/4*DX*DY)*(P_NX6+P_NX7))/((P_NX3)+(P_NX4)+(NU*(DX+DY))/(DX*DY))
 V(I,J)=((P_NY5)-(P_NY1)-(P_NY2)+(NU/4*DX*DY)*(P_NY6+P_NY7))/((P_NY3)+(P_NY4)+(NU*(DX+DY))/(DX*DY))
-!PRINT*,U(I,J),V(I,J),"SORAT"          !~~~~~~~~~~~~~~~~~
-      10  END DO
-        END DO
+10  END DO
+END DO
 !============================= SHARTE MARZI DAR KHORUJI , GRADIAN SORAT =0
 DO J=1,NY
   U(NX,J)=U(NX-1,J)
@@ -164,7 +157,6 @@ UV(:,:)=0
        D(I,J)=((U(I,J)-U(I-1,J))/DX)+((V(I,J)-V(I,J-1))/DY) 
       END DO
       END DO
-      
 DO I=2,NX-1
   DO J=2,NY-1
     UP(I,J)=U(I,J)**2
@@ -172,9 +164,6 @@ DO I=2,NX-1
     UV(I,J)=U(I,J)*V(I,J)
     END DO
     END DO
-
-
-
  !======================================== solving pressure
 POLD(:,:)=0
 PNEW(:,:)=0    
@@ -187,7 +176,6 @@ P_P3=(D(I+1,J)-2*D(I,J)+D(I-1,J))/(2*DX) +(D(I,J+1)-2*D(I,J)+D(I,J-1))/(2*DY)
 P_P4=(UP(I+1,J)-2*UP(I,J)+UP(I-1,J))/(2*DX)
 P_P5=0.5*(UV(I+1,J+1)-UV(I-1,J+1)-UV(I+1,J-1)+UV(I-1,J-1)) 
 P_P6=(VP(I+1,J)-2*VP(I,J)+VP(I-1,J))/(2*DY) 
-
 PNEW(I,J)= (P_P2-(2*DX*DY)*(P_P3/RE(I,J))-(P_P4)-(P_P5)-(P_P6))/P_P1
 ! PRINT*,PNEW(I,J),"FESHAR"
 END DO
@@ -196,13 +184,11 @@ O=0
 DO I=2,NX-1
   DO J=2,NY-1
    IF (ABS(PNEW(I,J)-POLD(I,J))<=EPSILON_P ) THEN
-     O=O+1 
-    
+     O=O+1  
 END IF
 END DO
 END DO
 POLD(:,:)=PNEW(:,:)                      
-
 if (o==NX*NY)THEN
    GOTO 100                      ! DOROSTE ?
   END IF
@@ -218,23 +204,19 @@ O=0
 END IF		
 		END DO 
         END DO
-
 IF ( O==(NX)*(NY) ) THEN
-  GOTO 13
-          
+  GOTO 13        
      END IF
-     
      	UTEMP(:,:)=U(:,:)
       	VTEMP(:,:)=V(:,:)
       	PTEMP(:,:)=P(:,:) 
      END DO         					
-
    13   UTEMP(:,:)=U(:,:)
       	VTEMP(:,:)=V(:,:)
       	PTEMP(:,:)=P(:,:) 
 
      
-   !DO ITER=1,150000
+   DO ITER=1,150000
  	 DO I=2,NX-1
   14  DO J=2,NY-1
 		IF(J<=NY1 .AND. I<=NX1 ) THEN
@@ -258,10 +240,8 @@ P_NY7=2*DX*(UTEMP(I,J+1)+UTEMP(I,J-1))
 !******************************************************		
 U(I,J)=((P_NX5)-(P_NX1)-(P_NX2)+(NU/4*DX*DY)*(P_NX6+P_NX7))/((P_NX3)+(P_NX4)+(NU*(DX+DY))/(DX*DY))
 V(I,J)=((P_NY5)-(P_NY1)-(P_NY2)+(NU/4*DX*DY)*(P_NY6+P_NY7))/((P_NY3)+(P_NY4)+(NU*(DX+DY))/(DX*DY))
-
         END DO
-        END DO  
-  
+        END DO    
 DO I=2,NX-1
   DO J=2,NY-1
     UP(I,J)=U(I,J)**2
@@ -269,8 +249,6 @@ DO I=2,NX-1
     UV(I,J)=U(I,J)*V(I,J)
     END DO
     END DO
-
-
 O=0
 POLD(:,:)=0
 DO ITERATION=1,1500000  
@@ -282,12 +260,9 @@ P_P3=(D(I+1,J)-2*D(I,J)+D(I-1,J))/(2*DX) +(D(I,J+1)-2*D(I,J)+D(I,J-1))/(2*DY)
 P_P4=(UP(I+1,J)-2*UP(I,J)+UP(I-1,J))/(2*DX)
 P_P5=0.5*(UV(I+1,J+1)-UV(I-1,J+1)-UV(I+1,J-1)+UV(I-1,J-1)) 
 P_P6=(VP(I+1,J)-2*VP(I,J)+VP(I-1,J))/(2*DY) 
-
-PNEW(I,J)= (P_P2-(2*DX*DY)*(P_P3/RE(I,J))-(P_P4)-(P_P5)-(P_P6))/P_P1
-  
+PNEW(I,J)= (P_P2-(2*DX*DY)*(P_P3/RE(I,J))-(P_P4)-(P_P5)-(P_P6))/P_P1  
 END DO
 END DO
-
 DO I=1,NX
   DO J=1,NY
    IF (ABS(PNEW(I,J)-POLD(I,J))<=EPSILON_P ) THEN
@@ -300,7 +275,6 @@ POLD(:,:)=PNEW(:,:)
 if (o==NX*NY) exit                     
   END DO
 P(:,:)=PNEW(:,:)
-
 OPEN(40,FILE='VELOCITY.TXT')
 WRITE(40,*)'VARIABLES=,"X","Y","U","V"'
 WRITE(40,*)'ZONE I=','NX','J=','NY','F=POINT'      
@@ -310,7 +284,6 @@ WRITE(40,*)'ZONE I=','NX','J=','NY','F=POINT'
       200 FORMAT(4F25.16)
       END DO
       END DO
-
 END PROGRAM BACKWARD   
 
 
